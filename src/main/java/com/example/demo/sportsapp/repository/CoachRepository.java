@@ -1,9 +1,14 @@
 package com.example.demo.sportsapp.repository;
 
-import com.example.demo.sportsapp.entity.Coach;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.example.demo.sportsapp.entity.dto.CoachDTO;
 
-@Repository
-public interface CoachRepository extends JpaRepository<Coach, Long> {
+import java.util.List;
+import java.util.Optional;
+
+public interface CoachRepository {
+    List<CoachDTO> findAll();
+    Optional<CoachDTO> findById(Long id);
+    CoachDTO save(CoachDTO dto);
+    CoachDTO update(Long id, CoachDTO dto);
+    void delete(Long id);
 }

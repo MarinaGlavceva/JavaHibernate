@@ -1,46 +1,36 @@
 package com.example.demo.sportsapp.controller;
 
 import com.example.demo.sportsapp.entity.dto.TeamDTO;
+import com.example.demo.sportsapp.entity.dto.TeamCreateDTO;
 import com.example.demo.sportsapp.service.TeamService;
+
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/teams")
+@RequiredArgsConstructor
+
 public class TeamController {
 
     private final TeamService teamService;
 
-    public TeamController(TeamService teamService) {
-        this.teamService = teamService;
-    }
-
-    @GetMapping
-    public ResponseEntity<List<TeamDTO>> getAllTeams() {
-        return ResponseEntity.ok(teamService.getAllTeams());
-    }
-
-    @GetMapping("/get/{id}")
-    public ResponseEntity<TeamDTO> getTeamById(@PathVariable Long id) {
-        return ResponseEntity.ok(teamService.getTeamById(id));
-    }
-
     @PostMapping
-    public ResponseEntity<TeamDTO> createTeam(@RequestBody TeamDTO teamDTO) {
-        return ResponseEntity.ok(teamService.createTeam(teamDTO));
+    public ResponseEntity<Void> createTeam(@RequestBody @Valid TeamCreateDTO dto) {
+        teamService.createTeam(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<TeamDTO> updateTeam(@PathVariable Long id, @RequestBody TeamDTO teamDTO) {
-        return ResponseEntity.ok(teamService.updateTeam(id, teamDTO));
+    @GetMapping("/{id}")
+    public ResponseEntity<TeamDTO> getTeam(@PathVariable Long id) {
+        TeamDTO dto = teamService.getTeamById(id);
+        return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteTeam(@PathVariable Long id) {
-        teamService.deleteTeam(id);
-        return ResponseEntity.noContent().build();
-    }
 }
 

@@ -5,72 +5,39 @@ import com.example.demo.sportsapp.entity.dto.MatchDTO;
 import com.example.demo.sportsapp.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
+
 public class MatchService {
 
     private final MatchRepository matchRepository;
 
-    public MatchService(MatchRepository matchRepository) {
-        this.matchRepository = matchRepository;
-    }
-
     public List<MatchDTO> getAllMatches() {
-        List<Match> matches = matchRepository.findAll();
-        List<MatchDTO> resultList = new ArrayList<>();
-        for (Match match : matches) {
-            resultList.add(MatchDTO.builder()
-                    .id(match.getId())
-                    .homeTeamId(match.getHomeTeam().getId())
-                    .awayTeamId(match.getAwayTeam().getId())
-                    .build());
-        }
-        return resultList;
+        return matchRepository.findAll();
     }
 
     public MatchDTO getMatchById(Long id) {
-        Optional<Match> match = matchRepository.findById(id);
-
-        return MatchDTO.builder()
-                .id(match.get().getId())
-                .homeTeamId(match.get().getHomeTeam().getId())
-                .awayTeamId(match.get().getAwayTeam().getId())
-                .build();
+        return matchRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Match with ID " + id + " not found"));
     }
 
-    public MatchDTO createMatch(MatchDTO matchDTO) {
-        Match match = new Match();
-        matchRepository.save(match);
-        return convertToDTO(match);
+    public MatchDTO createMatch(MatchDTO dto) {
+        return matchRepository.save(dto);
     }
 
-    private MatchDTO convertToDTO(Match match) {
-
-        return MatchDTO.builder()
-                .id(match.getId())
-                .homeTeamId(match.getHomeTeam().getId())
-                .awayTeamId(match.getAwayTeam().getId())
-                .build();
-    }
-
-
-
-    public MatchDTO updateMatch(Long id, MatchDTO matchDTO) {
-        Match match = new Match();
-        if (matchRepository.findById(id).isPresent()) {
-            match = matchRepository.findById(id).get();
+    public MatchDTO updateMatch(Long id, MatchDTO dto) {
+        if (matchRepository.findById(id).isEmpty()) {
+            throw new IllegalArgumentException("Match with ID " + id + " not found");
         }
-        matchRepository.save(match);
-        return convertToDTO(match);
+        return matchRepository.update(id, dto);
     }
 
     public void deleteMatch(Long id) {
-        if (matchRepository.findById(id).isPresent()) {
-            matchRepository.deleteById(id);
-        }
+        matchRepository.delete(id);
     }
-
 }
+
+
